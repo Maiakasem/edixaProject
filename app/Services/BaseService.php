@@ -32,9 +32,9 @@ class BaseService
     {
         return $this->repo->delete($id);
     }
-    public function get_paginated($request) 
+    public function getPaginated($request) 
     {
-        return $this->repo->get_paginated($request);
+        return $this->repo->getPaginated($request);
     }
     public function translateFields()
     {

@@ -28,7 +28,7 @@ class BackendCategoryController extends BaseController
      */
     public function index(Request $request)
     {
-        $response = $this->service->get_paginated($request);
+        $response = $this->service->getPaginated($request);
         if ($response['success']) {
             $categories = $response['data']; 
 
@@ -44,8 +44,8 @@ class BackendCategoryController extends BaseController
      */
     public function create()
     {
-        $translateFields = $this->service->translate_fields();
-        $columns_fields = $this->service->columns_fields();
+        $translateFields = $this->service->translateFields();
+        $columns_fields = $this->service->columnsFields();
         return view('admin.categories.create', compact('translateFields', 'columns_fields'));
     }
 
