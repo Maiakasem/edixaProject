@@ -17,7 +17,7 @@ class UpdateAnnouncementRequest extends FormRequest
             'slug'=>"required|max:190|unique:categories,slug,".$this->id,
             'title'=>"required|max:190",
             'description'=>"nullable|max:10000",
-            'meta_description'=>"nullable|max:10000",
+            
         ];
     }
 }
