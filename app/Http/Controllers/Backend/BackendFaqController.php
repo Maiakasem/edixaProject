@@ -6,6 +6,7 @@ use App\Models\Faq;
 use App\Services\FaqService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreFaqsRequest;
 use App\Http\Controllers\BaseController;
 
 class BackendFaqController extends BaseController
@@ -25,7 +26,6 @@ public function __construct(FaqService $service){
     public function index(Request $request)
     { 
         $response = $this->service->getPaginated($request);
-        dd(  $response);
         if ($response['success']) {
             $faqs = $response['data']; 
             
@@ -42,7 +42,9 @@ public function __construct(FaqService $service){
      */
     public function create()
     {
-        return view('admin.faqs.create');
+        $translateFields = $this->service->translateFields();
+        $columns_fields = $this->service->columnsFields();
+        return view('admin.faqs.create')->compact('translateFields','columns_fields');
     }
 
     /**
@@ -51,14 +53,10 @@ public function __construct(FaqService $service){
      * @param  \App\Http\Requests\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreFaqsRequest $request)
     {
-        Faq::create([
-           'user_id'=>auth()->user()->id,
-           'question'=>$request->question,
-           'answer'=>$request->answer,
-           'is_featured'=>$request->is_featured, 
-        ]);
+        
+        $response = $this->service->create($request);
         toastr()->success(__('utils/toastr.process_success_message'), __('utils/toastr.successful_process_message'));
         return redirect()->route('admin.faqs.index');
     }
@@ -82,7 +80,10 @@ public function __construct(FaqService $service){
      */
     public function edit(Faq $faq)
     {
-        return view('admin.faqs.edit',compact('faq'));
+        $translateFields = $this->service->translate_fields();
+        $columns_fields = $this->service->columns_fields();
+
+        return view('admin.faqs.edit',compact('faq','translateFields','columns_fields'));
     }
 
     /**
@@ -94,13 +95,13 @@ public function __construct(FaqService $service){
      */
     public function update(Request $request, Faq $faq)
     {
-        $faq->update([
-           'question'=>$request->question,
-           'answer'=>$request->answer,
-           'is_featured'=>$request->is_featured, 
-        ]);
-        toastr()->success(__('utils/toastr.process_success_message'), __('utils/toastr.successful_process_message'));
-        return redirect()->route('admin.faqs.index');
+        $response = $this->service->update($request->validated(), $category->id);
+        if ($response['success']) {
+            toastr()->success(__('utils/toastr.faq_update_success_message'), __('utils/toastr.successful_process_message'));
+        } else {
+            toastr()->error(__('utils/toastr.failed_process_message'));
+        }
+       return redirect()->route('admin.faqs.index');
     }
 
     /**
@@ -111,9 +112,12 @@ public function __construct(FaqService $service){
      */
     public function destroy(Faq $faq)
     {
-        if(!auth()->user()->can('faqs-delete'))abort(403);
-        $faq->delete();
-        toastr()->success(__('utils/toastr.process_success_message'), __('utils/toastr.successful_process_message'));
+        $response = $this->service->delete($faq->id);
+        if ($response['success']) {
+            toastr()->success(__('utils/toastr.faq_update_success_message'), __('utils/toastr.successful_process_message'));
+        } else {
+            toastr()->error(__('utils/toastr.failed_process_message'));
+        }
         return redirect()->route('admin.faqs.index');
     }
 
