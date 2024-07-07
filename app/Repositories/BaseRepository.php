@@ -150,6 +150,7 @@ class BaseRepository
 
     public function getPaginated($request, int $count = 10): array
     {
+       
         $searchTerm = $request->input('q', '');
 
         DB::beginTransaction();
@@ -168,11 +169,10 @@ class BaseRepository
             if (property_exists($this->model, 'searchable') && !empty($this->model->searchable)) {
                 $this->applySearchFilters($query, $searchTerm);
             }
-
+          
             $data = $query->distinct()
                 ->orderBy('id', 'DESC')
                 ->paginate($count);
-
             $response = ResponseHelper::format(200, true, 'Success', $data);
             DB::commit();
         } catch (\Throwable $th) {

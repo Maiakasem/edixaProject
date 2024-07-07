@@ -80,16 +80,12 @@
 							@php
 							$last_reply= $contact->replies()->orderBy('id','DESC')->first();
 							@endphp
-							@if($last_reply!=null)
-								{{
-									$last_reply->is_support_reply==1?"{{ __('lang.support') }}":$contact->name
-								}}
+							@if($last_reply != null)
+								{{ $last_reply->is_support_reply == 1 ? __('lang.support') : $contact->name }}
 								<br>
-								{{
-									mb_strimwidth($last_reply->content,0,80,'...') 
-								}}
+								{{ mb_strimwidth($last_reply->content, 0, 80, '...') }}
 							@else
-							{{$contact->name}}
+								{{ $contact->name }}
 							@endif
 							  
 						</td>

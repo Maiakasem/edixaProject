@@ -48,12 +48,7 @@ class Announcement extends Model implements HasMedia {
     }
     public function registerMediaConversions(?Media $media = null): void
     {
-        // $this
-        //     ->addMediaConversion('tiny')
-        //     ->fit(Manipulations::FIT_MAX, 120, 120)
-        //     ->width(120)
-        //     ->format(Manipulations::FORMAT_WEBP)
-        //     ->nonQueued();
+       
         $this
             ->addMediaConversion('tiny')
             ->fit( Fit::Contain, 120, 120)

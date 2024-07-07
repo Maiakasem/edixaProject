@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
-class ArticleService extends BaseService
+use App\Repositories\ContactRepository;
+
+class ContactService extends BaseService
 {
-    public function __construct(ArticleRepository $repo)
+    public function __construct(ContactRepository $repo)
     {
         parent::__construct($repo);
     }
@@ -13,8 +15,8 @@ class ArticleService extends BaseService
         
         $baseResponse = parent::create($request->validated());
         if($baseResponse['success']) {
-            $announcement = $baseResponse['data'];
-            $this->upload_image($request, $announcement);
+            $contacts = $baseResponse['data'];
+            $this->upload_image($request, $contacts);
         }
         return $baseResponse;
     }
@@ -23,15 +25,15 @@ class ArticleService extends BaseService
       
         $baseResponse = parent::update($request->validated(), $id);
         if($baseResponse['success']) {
-            $announcement = $baseResponse['data'];
-            $this->upload_image($request, $announcement);   
+            $contact = $baseResponse['data'];
+            $this->upload_image($request, $contact);   
         }
         return $baseResponse;
     }
-    public function upload_image($request, $article)  {
+    public function upload_image($request, $contact)  {
         if($request->hasFile('image')){
-            $image = $article->addMedia($request->image)->toMediaCollection('image');
-            $article->update(['image'=>$image->id.'/'.$image->file_name]);
+            $image = $contact->addMedia($request->image)->toMediaCollection('image');
+            $contact->update(['image'=>$image->id.'/'.$image->file_name]);
         }
         MainHelper::move_media_to_model_by_id($request->temp_file_selector,$article,"description");
     }

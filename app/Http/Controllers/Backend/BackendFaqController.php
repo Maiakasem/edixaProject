@@ -2,30 +2,37 @@
 
 namespace App\Http\Controllers\Backend;
 
-use App\Http\Controllers\Controller;
 use App\Models\Faq;
+use App\Services\FaqService;
 use Illuminate\Http\Request;
-class BackendFaqController extends Controller
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseController;
+
+class BackendFaqController extends BaseController
 {
 
-
-    public function __construct()
-    {
+public function __construct(FaqService $service){
+    
+        parent::__construct($service);
         $this->middleware('can:faqs-create', ['only' => ['create','store']]);
         $this->middleware('can:faqs-read',   ['only' => ['show', 'index']]);
         $this->middleware('can:faqs-update',   ['only' => ['edit','update']]);
         $this->middleware('can:faqs-delete',   ['only' => ['delete']]);
-    }
+    
+}
+   
 
     public function index(Request $request)
-    {
-        $faqs = Faq::where(function($q)use($request){
-            if($request->id!=null)
-                $q->where('id',$request->id);
-            if($request->q!=null)
-                $q->where('question','LIKE','%'.$request->q.'%')->orWhere('answer','LIKE','%'.$request->q.'%');
-        })->orderBy('order','ASC')->orderBy('id','DESC')->paginate(100);
-        return view('admin.faqs.index',compact('faqs'));
+    { 
+        $response = $this->service->getPaginated($request);
+        dd(  $response);
+        if ($response['success']) {
+            $faqs = $response['data']; 
+            
+            return view('admin.faqs.index',compact('faqs'));}
+            else {
+            abort($response['status'], $response['message']);
+        }
     }
 
     /**

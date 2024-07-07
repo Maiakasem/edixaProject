@@ -18,13 +18,12 @@
                             {{ __('lang.category') }}
                         </div>
                         <div class="col-12 pt-3">
-                        <select class="form-control select2-select" name="category_id[]" required  style="width: 100%;" multiple="multiple">
-                            @foreach($categories as $category)
-                                <option value="{{$category->id}}" {{ (old('category_id') == $category->id) ? 'selected' : '' }}>
-                                    {{$category->title}}
-                                </option>
-                            @endforeach
-                         </select>
+                        <select class="form-control select2-select" name="category_id[]" required multiple size="1" style="height:30px;opacity: 0;">
+                                @foreach($categories as $category)
+                                
+                                <option value="{{$category->id}}"@if(old('category_id')==$category->id) selected @endif>{{$category->title}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-12 col-lg-6 p-2">

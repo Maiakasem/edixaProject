@@ -53,27 +53,29 @@ use Translatable;
 
     }
 
-    public function registerMediaConversions(Media $media = null): void
+
+    public function registerMediaConversions(?Media $media = null): void
     {
+     
         $this
             ->addMediaConversion('tiny')
-            ->fit(Manipulations::FIT_MAX, 120, 120)
+            ->fit( Fit::Contain, 120, 120)
             ->width(120)
-            ->format(Manipulations::FORMAT_WEBP)
+            ->format('webp')
             ->nonQueued();
 
         $this
             ->addMediaConversion('thumb')
-            ->fit(Manipulations::FIT_MAX, 350, 1000)
+            ->fit(Fit::Contain, 350, 1000)
             ->width(350)
-            ->format(Manipulations::FORMAT_WEBP)
+            ->format('webp')
             ->nonQueued();
 
         $this
             ->addMediaConversion('original')
-            ->fit(Manipulations::FIT_MAX, 1200,10000)
+            ->fit(Fit::Contain, 1200,10000)
             ->width(1200)
-            ->format(Manipulations::FORMAT_WEBP)
+            ->format('webp')
             ->nonQueued();
 
     }
