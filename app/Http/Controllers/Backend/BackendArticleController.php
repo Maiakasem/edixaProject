@@ -30,6 +30,7 @@ class BackendArticleController extends Controller
         })->orderBy('id','DESC')->paginate();
         return view('admin.articles.index',compact('articles'));
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -40,6 +41,7 @@ class BackendArticleController extends Controller
     {
         $tags = Tag::get();
         $categories= Category::orderBy('id','DESC')->get();
+        // dd($tags,$categories);
         return view('admin.articles.create',compact('categories','tags'));
     }
 
