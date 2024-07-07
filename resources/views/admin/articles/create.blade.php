@@ -18,7 +18,7 @@
                             {{ __('lang.category') }}
                         </div>
                         <div class="col-12 pt-3">
-                         <select class="form-control select2-select" name="category_id[]" required  style="width: 100%;">
+                        <select class="form-control select2-select" name="category_id[]" required  style="width: 100%;" multiple="multiple">
                             @foreach($categories as $category)
                                 <option value="{{$category->id}}" {{ (old('category_id') == $category->id) ? 'selected' : '' }}>
                                     {{$category->title}}
@@ -32,7 +32,7 @@
                             {{ __('lang.tags') }}
                         </div>
                         <div class="col-12 pt-3">
-                            <select class="form-control select2-select" name="tag_id[]"  multiple size="1" style="height:30px;opacity: 0;">
+                            <select class="form-control select2-select" name="tag_id[]"  multiple  style="width: 100%;">
                                 @foreach($tags as $tag)
                                 <option value="{{$tag->id}}">{{$tag->tag_name}}</option>
                                 @endforeach
@@ -103,3 +103,4 @@
     </div>
 </div>
 @endsection
+

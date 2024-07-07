@@ -19,6 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+
 <style>
     *, html, body {
         font-family: 'Cairo', sans-serif;
@@ -42,7 +43,7 @@
   <link rel="stylesheet" href="{{ asset('dashboard') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.css" />
   <link rel="stylesheet" href="{{ asset('dashboard') }}/vendor/libs/typeahead-js/typeahead.css" />
   <link rel="stylesheet" href="{{ asset('dashboard/css/style.css') }}" />
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"  />
   <!-- Helpers -->
   <script src="{{ asset('dashboard') }}/vendor/js/helpers.js"></script>
 
@@ -51,7 +52,7 @@
   <script src="{{ asset('dashboard') }}/vendor/js/template-customizer.js"></script>
   <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
   <script src="{{ asset('dashboard') }}/js/config.js"></script>
-
+  
 </head>
 
 <body>
@@ -102,10 +103,18 @@
   <script src="{{ asset('dashboard') }}/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
   <script src="{{ asset('dashboard') }}/vendor/libs/hammer/hammer.js"></script>
   <script src="{{ asset('dashboard') }}/vendor/js/menu.js"></script>
+
   <!-- endbuild -->
 
   <!-- Main JS -->
   <script src="{{ asset('dashboard') }}/js/main.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+    $('.select2-select').select2();
+});
+</script>
   @livewireScripts
   @include('layouts.scripts')
   @yield('scripts')
