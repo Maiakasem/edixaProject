@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        /*
+
         // Path to the SQL file
         $path = public_path('all_data.sql');
 
@@ -27,7 +27,7 @@ return new class extends Migration
         } else {
             throw new \Exception("SQL file does not exist: $path");
         }
-            */
+           
 
     }
 
