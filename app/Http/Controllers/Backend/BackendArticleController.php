@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class BackendArticleController extends Controller
 {
-    
+
     public function __construct()
     {
         $this->middleware('can:articles-create', ['only' => ['create','store']]);
@@ -30,7 +30,7 @@ class BackendArticleController extends Controller
         })->orderBy('id','DESC')->paginate();
         return view('admin.articles.index',compact('articles'));
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -65,6 +65,8 @@ class BackendArticleController extends Controller
             'description'=>"nullable|max:100000",
             'meta_description'=>"nullable|max:10000",
         ]);
+
+        dd($request->all());
         $article = Article::create([
             'user_id'=>auth()->user()->id,
             "slug"=>$request->slug,
@@ -73,6 +75,7 @@ class BackendArticleController extends Controller
             "description"=>$request->description,
             "meta_description"=>$request->meta_description,
         ]);
+
         
         $article->categories()->sync($request->category_id);
         $article->tags()->sync($request->tag_id);
