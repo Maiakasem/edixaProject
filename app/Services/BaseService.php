@@ -19,7 +19,7 @@ class BaseService
 
     public function create($data)
     {
-        
+    
         return $this->repo->create($data);
     }
 

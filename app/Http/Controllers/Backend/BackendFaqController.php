@@ -27,8 +27,7 @@ public function __construct(FaqService $service){
     { 
         $response = $this->service->getPaginated($request);
         if ($response['success']) {
-            $faqs = $response['data']; 
-            
+            $faqs = $response['data'];
             return view('admin.faqs.index',compact('faqs'));}
             else {
             abort($response['status'], $response['message']);
@@ -95,7 +94,7 @@ public function __construct(FaqService $service){
      */
     public function update(Request $request, Faq $faq)
     {
-        $response = $this->service->update($request->validated(), $category->id);
+        $response = $this->service->update($request->validated(), $faq->id);
         if ($response['success']) {
             toastr()->success(__('utils/toastr.faq_update_success_message'), __('utils/toastr.successful_process_message'));
         } else {

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Repositories\ArticleRepository;
+
 class ArticleService extends BaseService
 {
     public function __construct(ArticleRepository $repo)
@@ -10,11 +12,13 @@ class ArticleService extends BaseService
     }
     public function create($request)
     {
-        
-        $baseResponse = parent::create($request->validated());
+        // dd ($request->all());
+        // $request->merge(['slug'=>\MainHelper::slug($reques;t->slug)]);
+    //    dd($request);
+        $baseResponse = parent::create($request->validated()); 
         if($baseResponse['success']) {
-            $announcement = $baseResponse['data'];
-            $this->upload_image($request, $announcement);
+            $article = $baseResponse['data'];
+            $this->upload_image($request, $article);
         }
         return $baseResponse;
     }
@@ -23,8 +27,8 @@ class ArticleService extends BaseService
       
         $baseResponse = parent::update($request->validated(), $id);
         if($baseResponse['success']) {
-            $announcement = $baseResponse['data'];
-            $this->upload_image($request, $announcement);   
+            $article = $baseResponse['data'];
+            $this->upload_image($request, $article);   
         }
         return $baseResponse;
     }

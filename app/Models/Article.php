@@ -59,7 +59,7 @@ use Translatable;
      
         $this
             ->addMediaConversion('tiny')
-            ->fit( Fit::Contain, 120, 120)
+            ->fit(Fit::Contain, 120, 120)
             ->width(120)
             ->format('webp')
             ->nonQueued();

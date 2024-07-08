@@ -169,10 +169,10 @@ class BaseRepository
             if (property_exists($this->model, 'searchable') && !empty($this->model->searchable)) {
                 $this->applySearchFilters($query, $searchTerm);
             }
-          
             $data = $query->distinct()
-                ->orderBy('id', 'DESC')
-                ->paginate($count);
+            // ->orderBy('id', 'DESC') // Specify the table alias or full table name
+            ->paginate($count);
+           
             $response = ResponseHelper::format(200, true, 'Success', $data);
             DB::commit();
         } catch (\Throwable $th) {
