@@ -245,11 +245,29 @@ return [
     'select_files'=>'Select Files',
     'not_found_record' => 'The record is not found',
 
-
-
+    'faqs' => 'FAQs',
+    'redirections' => 'Redirections',
     'translatable' => 'Translatable',
     'column' => 'Column',
     'searchable'=>'Searchable',
     'handle_old_tables'=>'Handle Old Tables',
+
+
+	'relation' => 'Relation',
+	'relation_key' => 'Relation Key',
+	'required' => 'Required',
+	'unique' => 'Unique',
+    'field'=>'Field',
+    'fields'=>'Fields',
+    'has_module'=>'Has Module',
+    'is_module_child'=> 'Is Module Child',
+    'relation_model'=>'Relation Model',
+    'has_migration'=>'Has Migration',
+    'has_model'=>'Has Model',
+    'has_blade'=>'Has Blade',
+    'has_controller'=>'Has Controller',
+    'module'=> 'Module'
+
+
 
 ];

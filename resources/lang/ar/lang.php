@@ -251,6 +251,22 @@ return [
 	'column'=>'عمود',
 	'searchable'=>'قابل للبحث',
     'handle_old_tables'=>'معالجة الجداول القديمة',
+	'redirections' => 'إعادة التوجيه',
+    'faqs' => 'الأسئلة الشائعة',
+
+	'relation' => 'العلاقة',
+	'relation_key' => 'مفتاح العلاقة',
+	'required' => 'مطلوب',
+	'unique' => 'فريد',
+	'field'=>'حقل',
+	'fields'=>'حقول',
+	'is_module_child'=> 'هل هذا الحقل ينتمي لوحدة',
+	'relation_model'=>'Relation Model',
+	'has_migration'=>'Has Migration',
+	'has_model'=>'Has Model',
+	'has_blade'=>'Has Blade',
+	'has_controller'=>'Has Controller',
+	'module'=> 'Module'
 
 
 

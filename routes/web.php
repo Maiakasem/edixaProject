@@ -1,5 +1,6 @@
 <?php
 # Backend Controllers
+use App\Http\Controllers\QuickMakerController;
 use App\Http\Controllers\TranslationHandlerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Backend\BackendAdminController;
@@ -72,6 +73,10 @@ Route::prefix('admin')->middleware(['auth','ActiveAccount'])->name('admin.')->gr
     Route::middleware('auth')->group(function () {
 
         
+        Route::resource('quick-makers', QuickMakerController::class);
+
+
+
         Route::get('translation-handler', [TranslationHandlerController::class, 'index']);
         Route::post('translation-handler', [TranslationHandlerController::class, 'store'])->name('translation_handler.store');
         

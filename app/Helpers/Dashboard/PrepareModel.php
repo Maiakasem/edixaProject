@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 
 class PrepareModel
 {
+    
     public function prepareModel($tableName, $columns)
     {
         // Make table name singular and capitalize first letter

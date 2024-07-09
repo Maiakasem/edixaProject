@@ -1,0 +1,26 @@
+[
+  {"name":"tinyInteger"},
+  {"name":"smallInteger"},
+  {"name":"mediumInteger"},
+  {"name":"integer"},
+  {"name":"bigInteger"},
+  {"name":"float"},
+  {"name":"decimal"},
+  {"name":"string"},
+  {"name":"tinyText"},
+  {"name":"text"},
+  {"name":"mediumText"},
+  {"name":"longText"},
+  {"name":"boolean"},
+  {"name":"date"},
+  {"name":"dateTime"},
+  {"name":"time"},
+  {"name":"timestamp"},
+  {"name":"year"},
+  {"name":"ipAddress"},
+  {"name":"json"},
+  {"name":"enum"},
+  {"name":"belongsTo"},
+  {"name":"belongsToMany"}
+]
+  
