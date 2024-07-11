@@ -8,36 +8,6 @@
                     <label for="nameFormControlInput" class="mb-2" class="form-label">{{ __('lang.name') }}</label>
                     <input type="text" class="form-control" name="name" id="nameFormControlInput" placeholder="{{ __('lang.name') }}">
                 </div>
-                <div class="col-lg">
-                    <label class="form-label" for="form-1">{{ __('lang.has_migration') }}</label>
-                    <select id="form-1" name="has_migration" class=" form-select">
-                        <option value="0">{{ __('lang.no') }}</option>
-                        <option value="1">{{ __('lang.yes') }}</option>
-                    </select>
-                </div>
-                <div class="col-lg">
-                    <label class="form-label" for="form-2">{{ __('lang.has_model') }}</label>
-                    <select id="form--2" name="has_model" class=" form-select">
-                        <option value="0">{{ __('lang.no') }}</option>
-                        <option value="1">{{ __('lang.yes') }}</option>
-                    </select>
-                </div>
-               
-                <div class="col-lg">
-                    <label class="form-label" for="form-3">{{ __('lang.has_controller') }}</label>
-                    <select id="form-3" name="has_controller" class=" form-select">
-                        <option value="0">{{ __('lang.no') }}</option>
-                        <option value="1">{{ __('lang.yes') }}</option>
-                    </select>
-                </div>
-
-                <div class="col-lg">
-                    <label class="form-label" for="form-3">{{ __('lang.has_blade') }}</label>
-                    <select id="form-3" name="has_blade" class=" form-select">
-                        <option value="0">{{ __('lang.no') }}</option>
-                        <option value="1">{{ __('lang.yes') }}</option>
-                    </select>
-                </div>
                 <div class="col-12">
                     <br>
                     <div class="row">
@@ -79,7 +49,7 @@
                             </div>
                             <div class="mb-3 col-lg-4 mb-0">
                                 <label class="form-label" for="form-repeater-1-2">{{ __('lang.type') }}</label>
-                                <select id="form-repeater-1-2" class="form-select">
+                                <select id="form-repeater-1-2" name="type" class="form-select">
                                     @foreach ($types as $type)
                                         <option value="{{ $type->type }}">{{ $type->type }}</option>
                                     @endforeach
@@ -102,7 +72,7 @@
                                     <div class="mb-3 col-lg-4 mb-0">
                                         <label class="form-label"
                                         for="form-repeater-1-5">{{ __('lang.relation_model') }}</label>
-                                        <select disabled id="form-repeater-1-5" class="form-select relation_model">
+                                        <select disabled id="form-repeater-1-5" name="relation_model" class="form-select relation_model">
                                             @foreach ($models as $model)
                                                 <option value="{{ $model }}">{{ $model }}</option>
                                             @endforeach

@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Astrotomic\Translatable\Translatable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
+
+
+class {{modelName}} extends Model {
+    
+    use HasFactory;
+    use Translatable;
+
+    public $searchable = {{searchable}};
+
+    public $columns = {{columns}};
+
+    public $translatedAttributes = {{translatedAttributes}};
+
+    protected $guarded = ['id'];
+
+}

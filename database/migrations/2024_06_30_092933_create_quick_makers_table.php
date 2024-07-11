@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('has_blade')->default(false);
             $table->boolean('has_controller')->default(false);
             $table->boolean('has_module')->default(false);
-            $table->string('module')->default(false);
+            $table->string('module')->nullable();
 
             $table->timestamps();
         });

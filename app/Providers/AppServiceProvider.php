@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
+        $this->loadViewsFrom(resource_path('views/stubs'), 'stubs');
         \App\Models\ContactReply::observe(\App\Observers\ContactReplyObserver::class);
         \App\Models\Contact::observe(\App\Observers\ContactObserver::class);
         

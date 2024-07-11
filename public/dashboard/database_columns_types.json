@@ -2,6 +2,7 @@
     {
       "type": "tinyInteger",
       "size": "1 byte",
+      "inputType": "number",
       "range": {
         "signed": "-128 to 127",
         "unsigned": "0 to 255"
@@ -9,6 +10,7 @@
     },
     {
       "type": "smallInteger",
+      "inputType": "number",
       "size": "2 bytes",
       "range": {
         "signed": "-32,768 to 32,767",
@@ -17,6 +19,7 @@
     },
     {
       "type": "mediumInteger",
+      "inputType": "number",
       "size": "3 bytes",
       "range": {
         "signed": "-8,388,608 to 8,388,607",
@@ -26,6 +29,7 @@
     {
       "type": "integer",
       "size": "4 bytes",
+     "inputType": "number",
       "range": {
         "signed": "-2,147,483,648 to 2,147,483,647",
         "unsigned": "0 to 4,294,967,295"
@@ -33,6 +37,7 @@
     },
     {
       "type": "bigInteger",
+      "inputType": "number",
       "size": "8 bytes",
       "range": {
         "signed": "-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807",
@@ -41,37 +46,56 @@
     },
     {
       "type": "float",
+      "inputType": "money",
       "size": "4 bytes",
       "range": "Approximate values, up to 7 decimal places of precision"
     },
     {
       "type": "DECIMAL",
+      "inputType": "money",
       "size": "Variable",
       "range": "Exact values, defined by precision and scale"
     },
    
       {
         "type": "string",
+        "inputType": "text",
         "size": "0 to 65,535 characters",
         "description": "Variable-length string"
       },
       {
         "type": "tinyText",
+        "inputType": "text",
         "size": "0 to 255 characters",
         "description": "Very small text"
       },
       {
         "type": "text",
+        "inputType": "textarea",
         "size": "0 to 65,535 characters",
         "description": "Small text"
       },
       {
         "type": "mediumText",
+        "inputType": "editor",
         "size": "0 to 16,777,215 characters",
         "description": "Medium-sized text"
       },
       {
         "type": "longText",
+        "inputType": "editor",
+        "size": "0 to 4,294,967,295 characters",
+        "description": "Large text"
+      },
+      {
+        "type": "belongsTo",
+        "inputType": "relation",
+        "size": "0 to 4,294,967,295 characters",
+        "description": "Large text"
+      },
+      {
+        "type": "belongsToMany",
+        "inputType":"relation",
         "size": "0 to 4,294,967,295 characters",
         "description": "Large text"
       }

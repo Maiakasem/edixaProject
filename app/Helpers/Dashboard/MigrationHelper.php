@@ -1,97 +1,50 @@
 <?php
 
 namespace App\Helpers\Dashboard;
-use Illuminate\Support\Facades\File;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\File;
 
 class MigrationHelper
 {
-    
-
-    private function getMigrationFileName($tableName)
-    {
-        // Get the latest migration file for the given table name
-        $files = glob(database_path('migrations/*.php'));
-        $migrationFile = null;
-
-        foreach ($files as $file) {
-            if (str_contains($file, $tableName)) {
-                $migrationFile = $file;
-            }
+    /**
+     * Create a new class instance.
+     */
+    public function createMigration($tableName, $columnStrings) {
+        $tableName = Str::snake(Str::plural($tableName));
+        if ($this->migrationExists($tableName)) {
+            return [
+                'message' => 'Migration already exists for table: ' . $tableName,
+                'success' => false
+            ];
         }
+        $stubPath = base_path('stubs/custom/migration.stub');
+        $migrationName = 'create_' . Str::snake($tableName) . '_table';
+        $fileName = date('Y_m_d_His') . '_' . $migrationName . '.php';
+        $migrationPath = database_path('migrations/' . $fileName);
 
-        if (!$migrationFile) {
-            throw new \Exception("Migration file for table $tableName not found.");
-        }
+        // Read the stub file
+        $filesystem = new Filesystem;
+        $stub = $filesystem->get($stubPath);
 
-        return basename($migrationFile);
-    }
-
-    public function addNewColumns($filePath, $columns, $translationModeName)
-    {
-        // Create the repository file from the stub
-        $stub = File::get(base_path('stubs/custom/migration.stub'));
-        $tableName = Str::plural(Str::snake($translationModeName));
-        $columnsString = $this->generateColumnString($columns, $translationModeName);
-        //dd($columnsString);
-        $stub = str_replace(
-            ['{{tableName}}', '{{columns}}'],
-            [$tableName, $columnsString],
-            $stub
-        );
-        File::put(database_path('migrations/'.$filePath), $stub);        
-    }
-
-    private function updateExistingColumns($filePath, $updateColumns)
-    {
-        $fileContents = file_get_contents($filePath);
-        foreach ($updateColumns as $column => $definition) {
-            $pattern = "/\$table->[^;]*\$column[^;]*;/";
-            $replacement = "\$table->$definition('$column');";
-            $fileContents = preg_replace($pattern, $replacement, $fileContents);
-        }
-
-        file_put_contents($filePath, $fileContents);
-    }
-
-    public function generateColumnString($columns, $translationModeName)
-    {
-        $columnStrings = [];
-        foreach ($columns as $columnName => $options) {
-            $method = $options['column_type'];
-            if (!empty($options['column_type_value']) && $options['column_type_value'] !== null) {
-                $columnStrings[] = "\$table->$method('$columnName', {$options['column_type_value']});";
-            } else {
-                $columnStrings[] = "\$table->$method('$columnName');";
-            }
-        }
-        $table = str_replace('Translation', '', $translationModeName);
-        $table = strtolower($table);
-
-        $columnStrings[] = "\$table->foreignId('$table"."_id"."');";
-        $columnStrings[] = "\$table->foreign('$table"."_id"."')->references('id')->on('".Str::plural($table)."')->cascadeOnUpdate()->cascadeOnDelete();";
-        $columnStrings[] = "\$table->string('locale')->index();";
-        $columnStrings[] = "\$table->unique(['$table"."_id"."', 'locale']);";
-        return implode("\n\t\t\t", $columnStrings);
-    }
-    public function checkIfMigrationExists($tableName)
-    {
-        $translationModeName = $tableName.'Translation'; 
-        $mTableName = 'create_'.Str::plural(Str::snake($translationModeName)).'_table';
-        $migrationsPath = database_path('migrations');
-        $migrationFiles = scandir($migrationsPath);
-        $hasMigration = false;
-        $hasFile = '';
-
-        foreach ($migrationFiles as $file) {
-            if (strpos($file, $mTableName) !== false) {
-                $hasMigration = true;     
-                $hasFile = $file;           
-            }
-        }
+        // Replace placeholders
+        $stub = str_replace('{{tableName}}', $tableName, $stub);
+        $stub = str_replace('{{columns}}', implode("\n", $columnStrings), $stub);
+        // Save the new migration file
+        $filesystem->put($migrationPath, $stub);    
         return [
-            'hasMigration' => $hasMigration,
-            'hasFile' => $hasFile
+            'message' => 'Migration successfully created',
+            'success' => true
         ];
+    }
+    private function migrationExists($tableName)
+    {
+        $migrationFiles = File::files(database_path('migrations'));
+        foreach ($migrationFiles as $file) {
+            if (Str::contains($file->getFilename(), Str::snake($tableName))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Dashboard\MigrationHelper;
+use App\Helpers\Dashboard\ModelHelper;
 use App\Models\QuickMaker;
+use App\Models\QuickMakerColumn;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Nwidart\Modules\Facades\Module;
-
 class QuickMakerController extends Controller
 {
     public function create()
@@ -52,43 +55,84 @@ class QuickMakerController extends Controller
     }
     public function store(Request $request)
     {
-        dd($request->all());
-        $columnStrings = [];
-        // $columnStrings[] = "\$table->$method('$columnName');";
-
-        foreach ($request->get('group-a') as $column) {
-            if ($column['relation'] != "0" && $column['relation']  != 0) {
-                
-            } else {
-               /*  if (!empty($column['value']) && $column['value'] !== null) {
-                    $columnStrings[] = "\$table->$method('$columnName', {$options['column_type_value']});";
-                } else {
-                    $columnStrings[] = "\$table->$method('$columnName');";
-                } */
-            }
-
-            
-        } 
-
+        
         DB::beginTransaction();
         try {
-            // Prepare Base
-            
+            $columnStrings      = [];
+            $columns            = [];
+            $translatable       = [];
+            $searchable         = [];
+            $hasTranslationTable = false;
+            $moduleName = $request->name;
+            $modelName = Str::studly(Str::singular($moduleName));
             $base = QuickMaker::create($this->baseData($request));
-        
-            // Prepare Columns
-
-            
-
-            
-            if ($request->is_module_child != "0" && $request->is_module_child != 0) {
-            
-                $this->preparingModelAndMigration($request);
-            
+            foreach ($request->get('group-a') as $column) {
+                $type               = $column['type'];
+                $columnName         = $column['name'];
+                if (isset($column['translatable']) && $column['translatable'] == '1') {
+                    $translatable[] = $column['name'];
+                    $hasTranslationTable = true;
+                } else {
+                    $columns[] = $column['name'];
+                }
+                if (isset($column['searchable']) && $column['searchable'] == '1') {
+                    $searchable[] = $column['name'];
+                }
+                if ($column['relation'] != "0" && $column['relation']  != 0) {
+                    if ($column['type'] == 'belongsTo') {
+                        $relation_key = $column['relation_key'];
+                        $table = Str::plural(Str::lower(class_basename($column['relation_model'])));
+                        $columnStrings[] = "\$table->foreignId('$relation_key');";
+                        $columnStrings[] = "\$table->foreign('$relation_key')->references('id')->on('$table')->cascadeOnUpdate()->cascadeOnDelete();";
+                    }
+                    
+                } else {
+                    $columnString = !empty($column['value']) && $column['value'] !== null ? "\$table->$type('$columnName', {$column['value']})" : "\$table->$type('$columnName')";
+                    if(!isset($column['required']) || $column['required'] == '0') {
+                        $columnString .= '->nullable()';
+                        
+                    }
+                    if($column['unique'] == '1') {
+                        $columnString .= '->unique()';
+                        
+                    }
+                    $columnString .= ';';
+                    $columnStrings[] = $columnString;
+                }
+                QuickMakerColumn::create([
+                    'quick_maker_id'    => $base->id,
+                    'name'              => $column['name'],
+                    'type'              => $column['type'],
+                    'required'          => $column['required'] ?? 0,
+                    'unique'            => $column['unique'] ?? 0,
+                    'searchable'        => $column['searchable'] ?? 0,
+                    'translatable'      => $column['translatable'] ?? 0,
+                    'relation'          => $column['relation'] ?? 0,
+                    'relation_model'    => $column['relation_model'] ?? null,
+                    'relation_key'      => $column['relation_key'] ?? null
+                ]);
             }
-        
+            $migration = new MigrationHelper();
+            $migration = $migration->createMigration($request->name, $columnStrings);
+            $columns = array_map(function($item) {
+                return "'{$item}'";
+            }, $columns);
+            $searchable = array_map(function($item) {
+                return "'{$item}'";
+            }, $searchable);
+            $translatable = array_map(function($item) {
+                return "'{$item}'";
+            }, $translatable);
+            $model = new ModelHelper();
+            $model = $model->createModel($request->name, $searchable, $columns, $translatable);
+            DB::commit();
+
+            Artisan::call('migrate');
+            Artisan::call('make:custom-repository '.$modelName);
+            Artisan::call('make:custom-service '.$modelName);
         } catch (\Throwable $th) {
-        
+            DB::rollBack();
+            dd($th->getMessage());
         }
         
         
@@ -99,53 +143,8 @@ class QuickMakerController extends Controller
     public function baseData($request) : array {
         return [
             'name'  => $request->name,
-            'has_migration'  => $request->has_migration,
-            'has_model'  => $request->has_model,
-            'has_controller'  => $request->has_controller,
-            'has_blade'  => $request->has_blade,
-            'has_module'  => $request->is_module_child,
             'module'  => $request->module,
-            
-            
-            //  	 	 	 	has_module 	
         ];
     }
-    public function preparingModelAndMigration($request) 
-    {
-        $hasMigration   = $request->has_migration;
-        
-        $hasModel       = $request->has_model;
-        
-        if($hasMigration == '1' && $hasModel == '1') {
-        
-            // Call Artisan Facade to create model and migration
-        
-            $this->createModel($request, true);
-        
-        } else if($hasMigration == '0' && $hasModel == '1') {
-        
-            $this->createModel($request, false);
-        
-        } else if($hasMigration == '1' && $hasModel == '0') {
-        
-            $this->createMigration($request->name);
-        
-        }        
-    }
-    public function createMigration($name) {
-        $name = \Str::plural($name);
-        // convert the name to snake case by Str Facade
-        $name = \Str::snake($name);
-        
-        Artisan::call('make:migration', [
-            'name' => 'create_'.$name.'_table',
-        ]);
-    }
-    public function createModel($request, $migration = true)
-    {
-        Artisan::call('make:model', [
-            'name' => $request->name,
-            '--migration' => $migration,
-        ]);
-    }
+    
 }

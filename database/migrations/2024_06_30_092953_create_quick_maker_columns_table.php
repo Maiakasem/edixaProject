@@ -33,6 +33,8 @@ return new class extends Migration
             'ipAddress',
             'json',
             'enum',
+            'belongsTo',
+            'belongsToMany',
         ];
 
         Schema::create('quick_maker_columns', function (Blueprint $table) use ($types){
@@ -43,7 +45,7 @@ return new class extends Migration
 
             $table->string('name');
             $table->enum('type', $types);
-            $table->string('label');
+            $table->string('label')->nullable();
             $table->boolean('required')->default(false);
             $table->boolean('unique')->default(false);
             $table->boolean('searchable')->default(false);
