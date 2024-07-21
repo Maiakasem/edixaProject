@@ -266,7 +266,13 @@ return [
 	'has_model'=>'Has Model',
 	'has_blade'=>'Has Blade',
 	'has_controller'=>'Has Controller',
-	'module'=> 'Module'
+	'module'=> 'Module',
+	'blade_type'	=> 'توع حقل blade',
+	'new_section'	=> 'قسم جديد',
+	'database'		=> 'قاعدة البيانات',
+	'spacial'       => 'متخصص',
+	'relationship'  => 'العلاقات',
+	'validation'	=> 'التحقق'
 
 
 

@@ -1,5 +1,5 @@
 /**
- * Academy Dashboard charts and datatable
+ * Academy QuickMaker charts and datatable
  */
 
 'use strict';

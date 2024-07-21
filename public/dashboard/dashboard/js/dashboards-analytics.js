@@ -1,5 +1,5 @@
 /**
- * Dashboard Analytics
+ * QuickMaker Analytics
  */
 
 'use strict';

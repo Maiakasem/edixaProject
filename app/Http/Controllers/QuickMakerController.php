@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Dashboard\MigrationHelper;
-use App\Helpers\Dashboard\ModelHelper;
+use App\Helpers\QuickMaker\MigrationHelper;
+use App\Helpers\QuickMaker\ModelHelper;
+use App\Helpers\QuickMaker\PermissionsHelper;
+use App\Helpers\QuickMaker\RequestHelper;
 use App\Models\QuickMaker;
 use App\Models\QuickMakerColumn;
 use Illuminate\Http\Request;
@@ -21,7 +23,114 @@ class QuickMakerController extends Controller
         $modules = Module::all();
         // Get All Models
         $models = $this->getAllModels();
-        return view('admin.quick-maker.create', compact('types', 'modules', 'models'));
+        $inputTypes = [
+            "checkbox"          => [
+                'required',
+                'accepted',
+                'nullable'
+            ],
+            "color"             => [
+                'required',
+                'regex:/^#(?:[0-9a-fA-F]{3}){1,2}$/',
+                'nullable'
+            ],
+            "date"              => [
+                'required',
+                'date',
+                'before:now',
+                'before:today',
+                'before:yesterday',
+                'after_or_equal:now',
+                'after_or_equal:today',
+                'after_or_equal:yesterday',
+                'nullable'
+            ],
+            "datetime-local"    => [
+                'date_format:Y-m-d\TH:i',
+                'required',
+                'nullable',
+                'date',
+                'before:now',
+                'before:today',
+                'before:yesterday',
+                'after_or_equal:now',
+                'after_or_equal:today',
+                'after_or_equal:yesterday'
+            ],
+            "email"             => [
+                'required',
+                'email',
+                'exists',
+                'max',
+                'nullable',
+            ],
+            "file"              => [
+                'required',
+                'mimes',
+                'min',
+                'max',
+                'nullable'
+            ],
+            "image"             => [
+                'required',
+                'nullable',
+                'mimes',
+                'min',
+                'max',
+                'image'
+            ],
+            "month"             => [
+                'required',
+                'date_format:Y-m',
+                'nullable',
+            ],
+            "number"            => [
+                'required',
+                'integer',
+                'nullable',
+                'between'
+            ],
+            "password"          => [
+                'required',
+                'string',
+                'min',              // Minimum length of 8 characters
+                'confirmed',          // Requires a matching password_confirmation field
+                'regex:/[a-z]/',      // Must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // Must contain at least one uppercase letter
+                'regex:/[0-9]/',      // Must contain at least one digit
+                'regex:/[@$!%*?&#]/', // Must contain a special character
+            ],
+            "tel"   => [
+                'required',
+                'string',
+                'regex:/^\+?[0-9]{10,15}$/', // Allows optional + at the start, followed by 10-15 digits
+                'nullable',
+            ],
+            "text"      => [
+                'required',
+                'string',
+                'min',
+                'max',
+                'nullable',
+            ],
+            "time"      => [
+                'required',
+                'nullable',
+                'date_format:H:i'
+            ],
+            "url"       => [
+                'required',
+                'nullable',
+                'url'
+            ],
+            "week"      => [
+                'required',
+                'nullable',
+                'date_format:Y-\WW'
+            ]
+        ];
+
+        return view('admin.quick-maker.create', compact('types', 'modules', 'models', 'inputTypes'));
     }
     public function getAllModels()
     {
@@ -55,7 +164,9 @@ class QuickMakerController extends Controller
     }
     public function store(Request $request)
     {
-        
+        $formRequest = new RequestHelper();
+        $storeFormRequest = $formRequest->createStoreFormRequest(json_decode($request->validations), $request->name);
+dd($storeFormRequest);
         DB::beginTransaction();
         try {
             $columnStrings      = [];
@@ -67,6 +178,7 @@ class QuickMakerController extends Controller
             $modelName = Str::studly(Str::singular($moduleName));
             $base = QuickMaker::create($this->baseData($request));
             foreach ($request->get('group-a') as $column) {
+
                 $type               = $column['type'];
                 $columnName         = $column['name'];
                 if (isset($column['translatable']) && $column['translatable'] == '1') {
@@ -85,16 +197,16 @@ class QuickMakerController extends Controller
                         $columnStrings[] = "\$table->foreignId('$relation_key');";
                         $columnStrings[] = "\$table->foreign('$relation_key')->references('id')->on('$table')->cascadeOnUpdate()->cascadeOnDelete();";
                     }
-                    
+
                 } else {
                     $columnString = !empty($column['value']) && $column['value'] !== null ? "\$table->$type('$columnName', {$column['value']})" : "\$table->$type('$columnName')";
                     if(!isset($column['required']) || $column['required'] == '0') {
                         $columnString .= '->nullable()';
-                        
+
                     }
                     if($column['unique'] == '1') {
                         $columnString .= '->unique()';
-                        
+
                     }
                     $columnString .= ';';
                     $columnStrings[] = $columnString;
@@ -125,6 +237,10 @@ class QuickMakerController extends Controller
             }, $translatable);
             $model = new ModelHelper();
             $model = $model->createModel($request->name, $searchable, $columns, $translatable);
+
+            $createPermissions = new PermissionsHelper();
+            $createPermissions->createPermissions($request->name);
+
             DB::commit();
 
             Artisan::call('migrate');
@@ -134,8 +250,8 @@ class QuickMakerController extends Controller
             DB::rollBack();
             dd($th->getMessage());
         }
-        
-        
+
+
 
 
 
@@ -146,5 +262,5 @@ class QuickMakerController extends Controller
             'module'  => $request->module,
         ];
     }
-    
+
 }

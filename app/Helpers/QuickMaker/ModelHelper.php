@@ -1,16 +1,25 @@
 <?php
 
-namespace App\Helpers\Dashboard;
+namespace App\Helpers\QuickMaker;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 
 class ModelHelper
 {
-    /**
-     * Create a new class instance.
-     */
-    public function createModel($modelName, $searchable, $columns, $translatedAttributes) {
+    /* Author : Omar Khaled
+    * Documented At : 15-7-2024
+    * Last Update At : 15-7-2024
+    * Description : Function Goal is Create Model File With a Custom Attributes
+    * Parameters : [
+    * @pram string $modelName
+    * @pram string $searchable
+    * @pram string $columns
+    * @pram string $translatedAttributes
+    * ]
+    *
+    *  */
+    public function createModel($modelName, $searchable, $columns, $translatedAttributes) : array {
         $modelName = Str::studly(Str::singular($modelName));
         if ($this->modelExists($modelName)) {
             return [
@@ -33,13 +42,22 @@ class ModelHelper
         $stub = str_replace('{{searchable}}', '['.implode(",", $searchable).']', $stub);
         $stub = str_replace('{{translatedAttributes}}', '['.implode(",", $translatedAttributes).']', $stub);
         // Save the new migration file
-        $filesystem->put($ModelPath, $stub);    
+        $filesystem->put($ModelPath, $stub);
         return [
             'message' => 'Model successfully created',
             'success' => true
         ];
     }
-    private function modelExists($modelName)
+    /* Author : Omar Khaled
+    * Documented At : 15-7-2024
+    * Last Update At : 15-7-2024
+    * Description : Function Goal is Check if migration file is existing or not
+    * Parameters : [
+    * @pram string $tableName
+    * ]
+    *
+    *  */
+    private function modelExists($modelName) : bool
     {
         $modelFiles = File::files(app_path('Models'));
         foreach ($modelFiles as $file) {

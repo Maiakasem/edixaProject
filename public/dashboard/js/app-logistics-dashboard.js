@@ -1,5 +1,5 @@
 /**
- *  Logistics Dashboard
+ *  Logistics QuickMaker
  */
 
 'use strict';

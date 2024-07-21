@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\Dashboard\MigrationHelper;
-use App\Helpers\Dashboard\PrepareModel;
+use App\Helpers\QuickMaker\MigrationHelper;
+use App\Helpers\QuickMaker\PrepareModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -108,15 +108,15 @@ class TranslationHandlerController extends Controller
         $requestData = $request->all();
         $requestAfterProcessing = $this->main($requestData);
         foreach ($requestAfterProcessing as $tableName => $columns) {
-            
-            $tableName = ucfirst(Str::singular($tableName));
-            
-            $translationModeName = $tableName.'Translation'; 
 
-            $prepareModel = new PrepareModel(); 
-            
+            $tableName = ucfirst(Str::singular($tableName));
+
+            $translationModeName = $tableName.'Translation';
+
+            $prepareModel = new PrepareModel();
+
             $prepareModel->prepareModel($tableName, $columns);
-            
+
         }
         dd(true);
 

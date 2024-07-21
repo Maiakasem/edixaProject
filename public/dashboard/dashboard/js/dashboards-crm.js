@@ -1,5 +1,5 @@
 /**
- * Dashboard CRM
+ * QuickMaker CRM
  */
 
 'use strict';

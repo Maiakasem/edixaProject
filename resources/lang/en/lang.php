@@ -46,7 +46,7 @@ return [
     "If you did not receive the email" => "If you did not receive the email",
     "click here to request another" => "click here to request another",
     'support' => 'Support',
-    'dashboard' => 'Dashboard',
+    'dashboard' => 'QuickMaker',
     'Sign' => 'Sign Via',
     'help' => 'Help',
     'no_have_account' => 'Don\'t have an account?',
@@ -202,7 +202,7 @@ return [
     'main_color' => 'Main Color',
     'hover_color' => 'Hover Color',
     'phone2' => 'Phone 2',
-    'dashboard_dark_mode' => 'Dashboard Dark Mode',
+    'dashboard_dark_mode' => 'QuickMaker Dark Mode',
     'whatsapp_phone' => 'Whatsapp Phone',
     'facebook_link' => 'Facebook Link',
     'twitter_link' => 'Twitter Link',
@@ -266,7 +266,14 @@ return [
     'has_model'=>'Has Model',
     'has_blade'=>'Has Blade',
     'has_controller'=>'Has Controller',
-    'module'=> 'Module'
+    'module'=> 'Module',
+    'blade_type'    => 'Blade Input Type',
+    'new_section'   => 'New Section',
+    'database'      => 'Database',
+    'spacial'       => 'Spacial',
+    'relationship'  => 'Relationship',
+    'validation'    => 'Validation'
+
 
 
 
