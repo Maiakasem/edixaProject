@@ -39,7 +39,7 @@ return new class extends Migration
 
         Schema::create('quick_maker_columns', function (Blueprint $table) use ($types){
             $table->id();
-            
+
             $table->foreignId('quick_maker_id');
             $table->foreign('quick_maker_id')->references('id')->on('quick_makers')->cascadeOnUpdate()->cascadeOnDelete();
 
@@ -51,6 +51,7 @@ return new class extends Migration
             $table->boolean('searchable')->default(false);
             $table->boolean('translatable')->default(false);
             $table->boolean('relation')->default(false);
+            $table->string('relation_display')->nullable();
             $table->string('relation_model')->nullable();
             $table->string('relation_key')->nullable();
             $table->timestamps();

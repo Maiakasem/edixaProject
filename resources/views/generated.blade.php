@@ -1,0 +1,2 @@
+@extends('layouts.admin') @section('content')<div class="col-12 col-md-6 px-0 d-flex mb-3">
+                            <div class="col-3 px-2 text-start pt-1">{{__('lang.user_id')}}</div> <div class="col-9 px-2"><select  name="user_id" class="form-select" required><option value="">Choose</option>@foreach(App\Models\User::get() as $item)<option value="{{ $item->id }}">{{ $item->name }}</option>@endforeach</select></div></div>@endsection
