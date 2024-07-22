@@ -1,22 +1,212 @@
+
+// Start Class Data
+let className           = document.querySelector('#className');
+let is_module_child     = document.querySelector('#is_module_child');
+let moduleIn            = document.querySelector('#module');
+let errorAlert          = document.querySelector('.errorAlert');
+let ClassData           = [];
+let columns             = [];
+// End Class Data
+
+
+// Start Database
+let DatabaseObj     = [];
+let DatabaseName    = document.querySelector('#DatabaseName');
+let DatabaseValue   = document.querySelector('#DatabaseValue');
+let DatabaseType    = document.querySelector('#DatabaseType');
+
+// End Database
+
+// Start Spacial Data
+let spacialObj      = [];
+let searchable      = document.querySelector('#searchable');
+let translatable    = document.querySelector('#translatable');
+// End Spacial Data
+
+// Start Relationship Data
+let relationshipObj = [];
+let relation        = document.querySelector('#relation');
+let relation_model  = document.querySelector('#relation_model')
+let relation_key    = document.querySelector('#relation_key');
+// End Relationship Data
+
+// Start Validation Data
+let validationObj   = [];
+// End Validation Data
+
+
+let SendToDatabase = document.querySelector('.SendToDatabase');
+SendToDatabase.addEventListener('click', (e) => {
+    e.preventDefault();
+    if(className.value[0] != "" && className.value != null) {
+        ClassData.push({"className":className.value});
+
+        let is_module_child_status = (is_module_child.value == 0) ? false : true;
+
+
+        ClassData.push({"is_module_child":is_module_child_status});
+        ClassData.push({"module":moduleIn.value});
+        ClassData.push({"columns":columns});
+
+        console.log(ClassData);
+    } else {
+        errorAlert.innerHTML = "Class Name is required";
+
+    }
+
+});
+
+
+// Start Add Column Data
+let AddColumn   = document.querySelector('.AddColumn');
+AddColumn.addEventListener('click', (e) => {
+    let column = [];
+    if(DatabaseName.value[0] != "" && DatabaseName.value != null) {
+        if(DatabaseValue.value[0] != "" && DatabaseValue.value != null) {
+
+
+            DatabaseObj.push({"columnName":DatabaseName.value});
+            DatabaseObj.push({"columnValue":DatabaseValue.value});
+            DatabaseObj.push({"columnType":DatabaseType.value});
+
+            column.push({"database":DatabaseObj});
+
+            DatabaseObj = [];
+
+            let searchableStatus = (searchable.value == 0) ? false : true;
+            let translatableStatus = (translatable.value == 0) ? false : true;
+            
+            spacialObj.push({"searchable": searchableStatus});
+            spacialObj.push({"translatable": translatableStatus});
+
+            column.push({"spacial":spacialObj});
+
+            spacialObj = [];
+
+
+            let relationStatus = (relation.value == 0) ? false : true;
+            relationshipObj.push({"relation" : relationStatus});
+            if(relationStatus) {
+                relationshipObj.push({"relation_model" : relation_model.value});
+                relationshipObj.push({"relation_key" : relation_key.value});
+            } else {
+                relationshipObj.push({"relation_model" : null});
+                relationshipObj.push({"relation_key" : null});
+            }
+
+            column.push({"relationship":relationshipObj});
+            relationshipObj = [];
+            columns.push(column);
+
+            let col = document.createElement('div');
+            col.className = "col-lg-3";
+
+            let card = document.createElement('div');
+            card.className = "card";
+
+
+            let cardBody = document.createElement('div');
+            cardBody.className = "card-body";
+
+            let listGroup = document.createElement('ul');
+            listGroup.className = "list-group";
+
+
+
+
+            let columnNameListItem = document.createElement('li');
+            columnNameListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            columnNameListItem.appendChild(document.createTextNode("columnName: " + DatabaseName.value));
+
+            let columnValueListItem = document.createElement('li');
+            columnValueListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            columnValueListItem.appendChild(document.createTextNode("columnValue: " + DatabaseValue.value));
+
+            let columnTypeListItem = document.createElement('li');
+            columnTypeListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            columnTypeListItem.appendChild(document.createTextNode("columnType: " + DatabaseType.value));
+
+            let searchableListItem = document.createElement('li');
+            searchableListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            searchableListItem.appendChild(document.createTextNode("searchable: " + searchableStatus));
+
+            let translatableListItem = document.createElement('li');
+            translatableListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            translatableListItem.appendChild(document.createTextNode("translatable: " + translatableStatus));
+
+            let relationListItem = document.createElement('li');
+            relationListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            relationListItem.appendChild(document.createTextNode("relation: " + relationStatus));
+
+            let relation_modelListItem = document.createElement('li');
+            relation_modelListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            relation_modelListItem.appendChild(document.createTextNode("relation_model: " + relation_model.value));
+
+            let relation_keyListItem = document.createElement('li');
+            relation_keyListItem.className = "list-group-item d-flex justify-content-between align-items-center";
+            relation_keyListItem.appendChild(document.createTextNode("relation_key: " + relation_key.value));
+
+            listGroup.appendChild(columnNameListItem);
+            listGroup.appendChild(columnValueListItem);
+            listGroup.appendChild(columnTypeListItem);
+            listGroup.appendChild(searchableListItem);
+            listGroup.appendChild(translatableListItem);
+            listGroup.appendChild(relationListItem);
+            listGroup.appendChild(relation_modelListItem);
+            listGroup.appendChild(relation_keyListItem);
+
+            cardBody.appendChild(listGroup);
+            card.appendChild(cardBody);
+            col.appendChild(card);
+            document.querySelector('.ListGroupContainer').appendChild(col);
+
+            DatabaseName.value    = '';
+            DatabaseValue.value   = '';
+            DatabaseType.value    = '';
+            searchable .value     = '';
+            translatable.value    = '';
+            relation.value        = '';
+            relation_model.value  = '';            
+            relation_key.value    = '';
+
+
+
+
+        } else {
+            errorAlert.innerHTML = "Column Value is required";
+        }
+    } else {
+        errorAlert.innerHTML = "Column Name is required";
+    }
+});
+// End Add Column Data
+
+
+
+
+
+is_module_child.addEventListener('change', function(e) {
+    if(e.target.value == 1) {
+        moduleIn.removeAttribute('disabled');
+    } else {
+        moduleIn.setAttribute('disabled', 'disabled');
+    }
+});
+
+relation.addEventListener('change', function(e) {
+    if(e.target.value == 1) {
+        relation_model.removeAttribute('disabled');
+        relation_key.removeAttribute('disabled');
+    } else {
+        relation_model.setAttribute('disabled', 'disabled');
+        relation_key.setAttribute('disabled', 'disabled');
+    }
+});
+
+
 $(function() {
     'use strict';
-    $("select[name='is_module_child']").change(function(e) {
-        e.preventDefault();
-        if($(this).val() === 1 || $(this).val() === "1") {
-            $("select[name='module']").prop('disabled', false);
-        } else {
-            $("select[name='module']").prop('disabled', true);
-        }
-    });
-    $(document).on("change",".relationFinder", function(e) {
-        if($(this).val() === 1 || $(this).val() === "1") {
-            $(this).parent().parent().find('.relation_model').prop('disabled', false);
-            $(this).parent().parent().find('.relation_key').prop('disabled', false);
-        } else {
-            $(this).parent().parent().find('.relation_model').prop('disabled', true);
-            $(this).parent().parent().find('.relation_key').prop('disabled', true);
-        }
-    });
+    
     $(document).on('change', '.validationSelector', function() {
         let validations = $(this).find('option:selected').data('validation');
         if(validations !== "" && validations != null) {
@@ -44,45 +234,4 @@ $(function() {
             ValidationSwitchInput.prop('disabled', true);
         }
     });
-});
-
-
-
-
-
-
-
-
-
-
-let QuickBuilderForm = document.querySelector('.QuickBuilderForm')
-document.querySelector('.SubmitQuickBuilderForm').addEventListener('click', (buttonEve) => {
-    buttonEve.preventDefault();
-    let validations = [];
-    document.querySelectorAll('.repeater-item').forEach((item) => {
-        let data = [];
-        let checkboxes = [];
-        let type = [];
-        let identifier = item.querySelector('.identifier').value;
-
-        item.querySelectorAll('.ValidationSwitches').forEach(function (box) {
-            if(box.checked) {
-                checkboxes.push(box.dataset.validation);
-            }
-        });
-        item.querySelectorAll('.ValidationInSwitches').forEach(function (box) {
-            if(box.checked) {
-                let validationRule = box.dataset.validation;
-                type.push({[validationRule]: box.parentElement.parentElement.parentElement.querySelector('.ValidationSwitchInput').value });
-            }
-        });
-        data.push(checkboxes);
-        data.push(type);
-        validations.push({[identifier]: data});
-    });
-    console.log(validations);
-    document.querySelector('#ValidationsData').value = JSON.stringify(validations);
-    setTimeout(() => {
-        QuickBuilderForm.submit();
-    }, 500);
 });

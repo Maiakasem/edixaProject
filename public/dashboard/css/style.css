@@ -21,3 +21,7 @@ table.table {
     display: flex;
     flex-direction: column;
 }
+[dir="rtl"] .modal-simple .btn-close {
+    left: 0 !important;
+    top: 0 !important;
+}
