@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\QuickMaker\MigrationHelper;
-use App\Helpers\QuickMaker\ModelHelper;
-use App\Helpers\QuickMaker\PermissionsHelper;
-use App\Helpers\QuickMaker\RequestHelper;
 use App\Models\QuickMaker;
-use App\Models\QuickMakerColumn;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use App\Models\QuickMakerColumn;
+use Illuminate\Support\Facades\DB;
 use Nwidart\Modules\Facades\Module;
+use Illuminate\Support\Facades\File;
+use App\Helpers\QuickMaker\BladeHelper;
+use App\Helpers\QuickMaker\ModelHelper;
+use App\Helpers\QuickMaker\RouteHelper;
+use Illuminate\Support\Facades\Artisan;
+use App\Helpers\QuickMaker\RequestHelper;
+use App\Helpers\QuickMaker\MigrationHelper;
+use App\Helpers\QuickMaker\PermissionsHelper;
+
 class QuickMakerController extends Controller
 {
     public function create()
@@ -166,7 +169,7 @@ class QuickMakerController extends Controller
     {
         $formRequest = new RequestHelper();
         $storeFormRequest = $formRequest->createStoreFormRequest(json_decode($request->validations), $request->name);
-dd($storeFormRequest);
+        // dd($storeFormRequest);
         DB::beginTransaction();
         try {
             $columnStrings      = [];
@@ -211,6 +214,7 @@ dd($storeFormRequest);
                     $columnString .= ';';
                     $columnStrings[] = $columnString;
                 }
+
                 QuickMakerColumn::create([
                     'quick_maker_id'    => $base->id,
                     'name'              => $column['name'],
@@ -221,7 +225,8 @@ dd($storeFormRequest);
                     'translatable'      => $column['translatable'] ?? 0,
                     'relation'          => $column['relation'] ?? 0,
                     'relation_model'    => $column['relation_model'] ?? null,
-                    'relation_key'      => $column['relation_key'] ?? null
+                    'relation_key'      => $column['relation_key'] ?? null,
+                    'relation_display'  => $column['relation_display'] ?? null
                 ]);
             }
             $migration = new MigrationHelper();
@@ -246,15 +251,17 @@ dd($storeFormRequest);
             Artisan::call('migrate');
             Artisan::call('make:custom-repository '.$modelName);
             Artisan::call('make:custom-service '.$modelName);
+
+            $model = new BladeHelper();
+            $model = $model->bladeCreate($column,$request->name);
+            // $model = new RouteHelper();
+            // $model = $model->routecreate($request->name);
+
+
         } catch (\Throwable $th) {
             DB::rollBack();
             dd($th->getMessage());
         }
-
-
-
-
-
     }
     public function baseData($request) : array {
         return [
@@ -262,5 +269,7 @@ dd($storeFormRequest);
             'module'  => $request->module,
         ];
     }
+
+
 
 }

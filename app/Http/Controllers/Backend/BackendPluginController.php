@@ -71,13 +71,11 @@ class BackendPluginController extends Controller
         $plugin = Module::findorFail($plugin);
         $module = $plugin->get('route');
 
-
         $permissions = ['create','read','update','delete'];
-
         foreach($permissions as $permission){
             \Spatie\Permission\Models\Permission::where('name',$module . '-' . $permission)->delete();
         }
-        
+
 
         \Artisan::call('module:migrate-reset '.$plugin->getName(),['--force' => true]);
         toastr()->success("تمت عملية تعطيل الاضافة بنجاح");
@@ -90,5 +88,5 @@ class BackendPluginController extends Controller
         return redirect()->route('admin.plugins.index');
     }
 
-    
+
 }
