@@ -272,7 +272,8 @@ return [
     'database'      => 'Database',
     'spacial'       => 'Spacial',
     'relationship'  => 'Relationship',
-    'validation'    => 'Validation'
+    'validation'    => 'Validation',
+    'new_module'	=> 'New Module',
 
 
 

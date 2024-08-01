@@ -8,84 +8,85 @@ use Illuminate\Support\Facades\App;
 
 class RequestHelper
 {
-    private function createValidationRules($columns, $tableName) : array {
-
-        $validation = [];
-        foreach ($columns as $column) {
-            $rules = [];
-            dd($column);
-            if($column['required'] == '1') {
-                $rules[] = 'required';
-            }
-            if($column['unique'] == '1') {
-                $rules[] = 'unique:'.Str::snake(Str::plural($tableName));
-            }
-            if($column['type'] == 'string') {
-                $rules[] = 'string';
-            }
-            if($column['type'] == 'string' && $column['value'] != null) {
-                $rules[] = 'max:'.$column['value'];
-            }
-            if($column['relation'] == '1') {
-                $rules[] = 'numeric';
-                $modelClassName = $column['relation_model'];
-                if (class_exists($modelClassName)) {
-                    // Instantiate the model
-                    $modelInstance = App::make($modelClassName);
-
-                    // Get the table name
-                    $tableName = $modelInstance->getTable();
-                    $rules[] = 'exists:'.$tableName.',id';
-
-                }
-            }
-
-            $validation[$column['name']] = $rules;
-
-        }
-        return $validation;
-    }
     public function createStoreFormRequest($columns, $tableName)
     {
-        $validation = $this->createValidationRules($columns, $tableName);
-        dd($validation);
-        return [];
-    }
-    /**
-     * Create a new class instance.
-     */
-/*     public function createStoreRequest($modelName) {
-        $modelName = Str::studly(Str::singular($modelName)).'StoreRequest';
-        if ($this->modelExists($modelName)) {
+        $modelName = Str::studly(Str::singular($tableName)).'StoreRequest';
+        $kebab = Str::kebab(Str::plural($tableName));
+        if ($this->requestExists($modelName)) {
             return [
                 'message' => 'Request already exists for : ' . $modelName,
                 'success' => false
             ];
         }
-        $stubPath = base_path('stubs/custom/request.stub');
+        $validationString = implode(",\n    ", array_map(function ($key, $rules) {
+            $rulesString = implode(",\n        ", array_map(function ($rule) {
+                return "'{$rule}'";
+            }, $rules));
+            return "'{$key}' => [\n        {$rulesString}\n    ]";
+        }, array_keys($columns), $columns));
+       // dd($validationString);
 
-        $fileName = $modelName . '.php';
-        $ModelPath = app_path('Http/Requests/' . $fileName);
+    
 
-        // Read the stub file
-        $filesystem = new Filesystem;
-        $stub = $filesystem->get($stubPath);
+        $stubPath = base_path('stubs/custom/store-request.stub');
+        $stubContent = File::get($stubPath);
 
-        // Replace placeholders
-        $stub = str_replace('{{modelName}}', $modelName, $stub);
-        $stub = str_replace('{{columns}}', '['.implode(",", $columns).']', $stub);
-        $stub = str_replace('{{searchable}}', '['.implode(",", $searchable).']', $stub);
-        $stub = str_replace('{{translatedAttributes}}', '['.implode(",", $translatedAttributes).']', $stub);
-        // Save the new migration file
-        $filesystem->put($ModelPath, $stub);
+        // Replace the placeholder with the actual validation rules
+        $stubContent = str_replace('{{ $modelName }}', $modelName, $stubContent);
+        $stubContent = str_replace('{{ $validations }}', $validationString, $stubContent);
+        $stubContent = str_replace('{{ $className }}', $kebab, $stubContent);
+
+        // Save the modified content to a new file (or do whatever you need with it)
+        $outputPath = app_path('Http/Requests/'.$modelName.'.php');
+        File::put($outputPath, $stubContent);
+
         return [
-            'message' => 'Model successfully created',
+            'message' => 'request successfully created',
             'success' => true
         ];
     }
-    private function modelExists($modelName)
+
+
+
+    public function createUpdateFormRequest($columns, $tableName) 
     {
-        $modelFiles = File::files(app_path('Models'));
+        $modelName = Str::studly(Str::singular($tableName)).'UpdateRequest';
+        $kebab = Str::kebab(Str::plural($tableName));
+        if ($this->requestExists($modelName)) {
+            return [
+                'message' => 'Request already exists for : ' . $modelName,
+                'success' => false
+            ];
+        }
+        $validationString = implode(",\n    ", array_map(function ($key, $rules) {
+            $rulesString = implode(",\n        ", array_map(function ($rule) {
+                return "'{$rule}'";
+            }, $rules));
+            return "'{$key}' => [\n        {$rulesString}\n    ]";
+        }, array_keys($columns), $columns));
+
+    
+
+        $stubPath = base_path('stubs/custom/update-request.stub');
+        $stubContent = File::get($stubPath);
+
+        // Replace the placeholder with the actual validation rules
+        $stubContent = str_replace('{{ $modelName }}', $modelName, $stubContent);
+        $stubContent = str_replace('{{ $validations }}', $validationString, $stubContent);
+        $stubContent = str_replace('{{ $className }}', $kebab, $stubContent);
+
+        // Save the modified content to a new file (or do whatever you need with it)
+        $outputPath = app_path('Http/Requests/'.$modelName.'.php');
+        File::put($outputPath, $stubContent);
+
+        return [
+            'message' => 'request successfully created',
+            'success' => true
+        ];
+    }
+    private function requestExists($modelName)
+    {
+        $modelFiles = File::files(app_path('Http/Requests'));
         foreach ($modelFiles as $file) {
             $modelName = Str::studly(Str::singular($modelName));
             if (Str::contains($file->getFilename(), $modelName)) {
@@ -94,5 +95,5 @@ class RequestHelper
         }
         return false;
     }
- */
+ 
 }

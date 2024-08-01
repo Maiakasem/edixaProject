@@ -272,7 +272,8 @@ return [
 	'database'		=> 'قاعدة البيانات',
 	'spacial'       => 'متخصص',
 	'relationship'  => 'العلاقات',
-	'validation'	=> 'التحقق'
+	'validation'	=> 'التحقق',
+	'new_module'	=> 'Module جديد',
 
 
 

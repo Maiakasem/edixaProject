@@ -72,7 +72,7 @@ Route::prefix('admin')->middleware(['auth', 'ActiveAccount'])->name('admin.')->g
 
 
         Route::resource('quick-makers', QuickMakerController::class);
-
+        Route::post('quick-makers/create-module', [QuickMakerController::class, 'create_module'])->name('quick-makers.create-module');
 
 
         Route::get('translation-handler', [TranslationHandlerController::class, 'index']);

@@ -1,5 +1,6 @@
 {
     "Blog": true,
     "Team": false,
-    "Course": true
+    "Course": true,
+    "NewModule": true
 }

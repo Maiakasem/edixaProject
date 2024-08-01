@@ -19,6 +19,16 @@ use App\Helpers\QuickMaker\PermissionsHelper;
 
 class QuickMakerController extends Controller
 {
+    public function index()
+    {
+        return view('admin.quick-maker.index');
+    }
+    public function create_module(Request $request) 
+    {
+        Artisan::call('module:make '.$request->name);
+        return redirect()->route('admin.quick-makers.create');
+
+    }
     public function create()
     {
         $types = json_decode(File::get(public_path('dashboard/database_columns_types.json')));
@@ -66,6 +76,7 @@ class QuickMakerController extends Controller
                 'exists',
                 'max',
                 'nullable',
+                'unique'
             ],
             "file"              => [
                 'required',
@@ -108,6 +119,7 @@ class QuickMakerController extends Controller
                 'string',
                 'regex:/^\+?[0-9]{10,15}$/', // Allows optional + at the start, followed by 10-15 digits
                 'nullable',
+                'unique'
             ],
             "text"      => [
                 'required',
@@ -115,6 +127,7 @@ class QuickMakerController extends Controller
                 'min',
                 'max',
                 'nullable',
+                'unique'
             ],
             "time"      => [
                 'required',
@@ -124,7 +137,8 @@ class QuickMakerController extends Controller
             "url"       => [
                 'required',
                 'nullable',
-                'url'
+                'url',
+                'unique'
             ],
             "week"      => [
                 'required',
@@ -167,106 +181,141 @@ class QuickMakerController extends Controller
     }
     public function store(Request $request)
     {
-        $formRequest = new RequestHelper();
-        $storeFormRequest = $formRequest->createStoreFormRequest(json_decode($request->validations), $request->name);
-        // dd($storeFormRequest);
-        DB::beginTransaction();
-        try {
-            $columnStrings      = [];
-            $columns            = [];
-            $translatable       = [];
-            $searchable         = [];
-            $hasTranslationTable = false;
-            $moduleName = $request->name;
-            $modelName = Str::studly(Str::singular($moduleName));
-            $base = QuickMaker::create($this->baseData($request));
-            foreach ($request->get('group-a') as $column) {
+        $formData                   = json_decode($request->formData);
+        $className                  = $formData[0]->className;
+        $is_module_child            = $formData[1]->is_module_child;
+        $module                     = $formData[2]->module;
+        $columnsData                = $formData[3]->columns;
 
-                $type               = $column['type'];
-                $columnName         = $column['name'];
-                if (isset($column['translatable']) && $column['translatable'] == '1') {
-                    $translatable[] = $column['name'];
+
+
+        if(!$is_module_child) {
+            $columnStrings          = [];
+            $columns                = [];
+            $translatableArr           = [];
+            $searchableArr             = [];
+            $validationsArr             = [];
+            $hasTranslationTable    = false;
+            $modelName = Str::studly(Str::singular($className));
+            $base = QuickMaker::firstOrCreate($this->baseData($className, $module ?? null));
+            foreach ($columnsData as $column) {
+                $validationArr             = [];
+                // Start Database
+                $database               = $column[0]->database;
+                $columnName             = $database[0]->columnName;
+                $columnValue            = $database[1]->columnValue;
+                $columnType             = $database[2]->columnType;
+                // End Database
+                // Start Validations
+                $validations            = $column[3]->validations;
+               // dd($validations);
+                $blade_type             = $validations[0]->blade_type;
+                $checkboxes             = $validations[1]->checkboxes;
+                $values                 = $validations[2]->values;
+                if (!empty($checkboxes)) {
+                    foreach ($checkboxes as $key => $rule) {
+                        $validationArr[] = $rule; 
+                    }
+                }
+                if (!empty($values)) {
+                    foreach ($values as $key => $rule) {
+                        foreach ($rule as $key => $value) {
+                            $validationArr[] = $key.":".$value; 
+                        }
+                    }
+                }
+               
+                $validationsArr[$columnName] = $validationArr;
+                // End Validations
+                
+                // Start Spacial
+                $spacial            = $column[1]->spacial;
+                $searchable         = $spacial[0]->searchable;
+                $translatable       = $spacial[1]->translatable;
+                // Start Spacial
+
+                // Start Relationship
+                $relationship       = $column[2]->relationship;
+                $relation           = $relationship[0]->relation;
+                $relation_model     = $relationship[1]->relation_model;
+                $relation_key       = $relationship[2]->relation_key;
+                $relation_display   = $relationship[3]->relation_display ?? null;
+                
+                // End Relationship
+                
+                if (isset($translatable) && $translatable) {
+                    $translatableArr[] =  $columnName;
                     $hasTranslationTable = true;
                 } else {
-                    $columns[] = $column['name'];
+                    $columns[] =  $columnName;
                 }
-                if (isset($column['searchable']) && $column['searchable'] == '1') {
-                    $searchable[] = $column['name'];
+                if (isset($searchable) && $searchable) {
+                    $searchableArr[] = $columnName;
                 }
-                if ($column['relation'] != "0" && $column['relation']  != 0) {
-                    if ($column['type'] == 'belongsTo') {
-                        $relation_key = $column['relation_key'];
-                        $table = Str::plural(Str::lower(class_basename($column['relation_model'])));
+                if ($relation) {
+                    if ($columnType == 'belongsTo') {
+                        $table = Str::plural(Str::lower(class_basename($relation_model)));
                         $columnStrings[] = "\$table->foreignId('$relation_key');";
                         $columnStrings[] = "\$table->foreign('$relation_key')->references('id')->on('$table')->cascadeOnUpdate()->cascadeOnDelete();";
                     }
-
                 } else {
-                    $columnString = !empty($column['value']) && $column['value'] !== null ? "\$table->$type('$columnName', {$column['value']})" : "\$table->$type('$columnName')";
-                    if(!isset($column['required']) || $column['required'] == '0') {
-                        $columnString .= '->nullable()';
+                    $columnString = !empty($columnValue) && $columnValue !== null ? "\$table->$columnType('$columnName', {$columnValue})" : "\$table->$columnType('$columnName')";
+                    $columnString .= in_array('unique', $validationsArr[$columnName]) ? '->unique()' : '';
+                    $columnString .= !in_array('required', $validationsArr[$columnName]) ? '->nullable()' : '';
+                    $columnString .= in_array($columnName, $searchableArr) ? '>index()' : ''; 
 
-                    }
-                    if($column['unique'] == '1') {
-                        $columnString .= '->unique()';
-
-                    }
+                    
                     $columnString .= ';';
                     $columnStrings[] = $columnString;
                 }
-
                 QuickMakerColumn::create([
                     'quick_maker_id'    => $base->id,
-                    'name'              => $column['name'],
-                    'type'              => $column['type'],
-                    'required'          => $column['required'] ?? 0,
-                    'unique'            => $column['unique'] ?? 0,
-                    'searchable'        => $column['searchable'] ?? 0,
-                    'translatable'      => $column['translatable'] ?? 0,
-                    'relation'          => $column['relation'] ?? 0,
-                    'relation_model'    => $column['relation_model'] ?? null,
-                    'relation_key'      => $column['relation_key'] ?? null,
-                    'relation_display'  => $column['relation_display'] ?? null
+                    'name'              => $columnName,
+                    'type'              => $columnType,
+                    'searchable'        => $searchable,
+                    'translatable'      => $translatable,
+                    'relation'          => $relation,
+                    'relation_model'    => $relation_model,
+                    'relation_key'      => $relation_key,
+                    'relation_display'  => $relation_display,
+                    'blade_type'        => $blade_type
                 ]);
             }
+            $makeRequest = new RequestHelper();
+            $makeRequest->createStoreFormRequest($validationsArr, $className);
+
+            $makeRequest = new RequestHelper();
+            $makeRequest->createUpdateFormRequest($validationsArr, $className);
+
             $migration = new MigrationHelper();
-            $migration = $migration->createMigration($request->name, $columnStrings);
+            $migration = $migration->createMigration($modelName, $columnStrings);
             $columns = array_map(function($item) {
                 return "'{$item}'";
             }, $columns);
-            $searchable = array_map(function($item) {
+            $searchableArr = array_map(function($item) {
                 return "'{$item}'";
-            }, $searchable);
-            $translatable = array_map(function($item) {
+            }, $searchableArr);
+            $translatableArr = array_map(function($item) {
                 return "'{$item}'";
-            }, $translatable);
+            }, $translatableArr);
             $model = new ModelHelper();
-            $model = $model->createModel($request->name, $searchable, $columns, $translatable);
+            $model = $model->createModel($modelName, $searchableArr, $columns, $translatableArr);
 
             $createPermissions = new PermissionsHelper();
-            $createPermissions->createPermissions($request->name);
+            $createPermissions->createPermissions($modelName);
 
-            DB::commit();
-
+            Artisan::call('make:custom-repository '.$modelName);
             Artisan::call('migrate');
             Artisan::call('make:custom-repository '.$modelName);
             Artisan::call('make:custom-service '.$modelName);
-
-            $model = new BladeHelper();
-            $model = $model->bladeCreate($column,$request->name);
-            // $model = new RouteHelper();
-            // $model = $model->routecreate($request->name);
-
-
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            dd($th->getMessage());
+            Artisan::call('make:custom-controller '.$modelName);
+            // Artisan::call('make:custom-api-controller '.$modelName);
         }
     }
-    public function baseData($request) : array {
+    public function baseData($name, $module = null) : array {
         return [
-            'name'  => $request->name,
-            'module'  => $request->module,
+            'name'  => $name,
+            'module'  => $module,
         ];
     }
 

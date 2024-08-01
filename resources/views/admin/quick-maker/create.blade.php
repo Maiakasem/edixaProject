@@ -12,27 +12,30 @@
                     </div>
                     <div class="col-12">
                         <br>
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <label class="form-label" for="form-4">{{ __('lang.is_module_child') }}</label>
-                                <select name="is_module_child" class=" form-select" id="is_module_child">
-                                    <option value="0">{{ __('lang.no') }}</option>
-                                    <option value="1">{{ __('lang.yes') }}</option>
-                                </select>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <label class="form-label" for="module">{{ __('lang.module') }}</label>
-                                <select disabled  name="module" class="form-select" id="module">
-                                    <option value="">
-                                        {{ __('lang.no') }}
-                                    </option>
-                                    @foreach ($modules as $name => $module)
-                                        <option value="{{ $name }}">{{ $name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                        <div class="">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label class="form-label" for="form-4">{{ __('lang.is_module_child') }}</label>
+                                    <select name="is_module_child" class=" form-select" id="is_module_child">
+                                        <option value="0">{{ __('lang.no') }}</option>
+                                        <option value="1">{{ __('lang.yes') }}</option>
+                                    </select>
+                                </div>
+    
+                                <div class="col-lg-6">
+                                    <label class="form-label" for="module">{{ __('lang.module') }}</label>
+                                    <select disabled  name="module" class="form-select" id="module">
+                                        <option value="">
+                                            {{ __('lang.no') }}
+                                        </option>
+                                        @foreach ($modules as $name => $module)
+                                            <option value="{{ $name }}">{{ $name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>     
                         </div>
+                       
                     </div>
                 </div>
             </div>
@@ -106,8 +109,9 @@
             </div> --}}
         </div>
         <br>
+        @csrf
         <button type="button" class="btn btn-primary SendToDatabase">{{ __('lang.save') }}</button>
-
+        <input name="formData" id="formData" type="hidden">
     </form>
     
     <div class="modal fade relative" id="spacialModal" tabindex="-1" aria-hidden="true">
@@ -158,7 +162,7 @@
                                     <option value="1">{{ __('lang.yes') }}</option>
                                 </select>
                             </div>
-                            <div class="mb-3 col-lg-4 mb-0">
+                            <div class="mb-3 col-lg-3 mb-0">
                                 <label class="form-label"
                                 for="relation_model">{{ __('lang.relation_model') }}</label>
                                 <select disabled id="relation_model" name="relation_model" class="form-select relation_model">
@@ -167,11 +171,17 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mb-3 col-lg-4 mb-0">
+                            <div class="mb-3 col-lg-3 mb-0">
                                 <label class="form-label"
                                     for="relation_key">{{ __('lang.relation_key') }}</label>
                                 <input type="text" id="relation_key" class="form-control relation_key"
                                     placeholder="{{ __('lang.relation_key') }}" name="relation_key" disabled />
+                            </div>
+                            <div class="mb-3 col-lg-3 mb-0">
+                                <label class="form-label"
+                                    for="relation_display">{{ __('lang.relation_display') }}</label>
+                                <input type="text" id="relation_display" class="form-control relation_display"
+                                    placeholder="{{ __('lang.relation_display') }}" name="relation_display" disabled />
                             </div>
                         </div>
                     </div>

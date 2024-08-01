@@ -22,7 +22,7 @@ class BladeHelper
         $output .= "            <h4></h4>" . "\n";
         $output .= "        </div>" . "\n";
         $output .= "        <div class='col-12 col-lg-9 px-3 py-5'>" . "\n";
-        $output .= "            <form class='col-12' method='POST' action='{$w}' enctype='multipart/form-data'>" . "\n";
+        $output .= "            <form class='col-12' method='POST' action='admin.{$table_name}.store' enctype='multipart/form-data'>" . "\n";
         $output .= "                @csrf" . "\n";
         foreach ($columns as $column) {
             $output .= '<div class="col-12 col-md-6 px-0 d-flex mb-3">' . "\n";
